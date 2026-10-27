@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pocket Memo 💜
 // @namespace    pocket-memo-independent
-// @version      1.0.2
+// @version      1.0.3
 // @updateURL    https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @downloadURL  https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @description  라벤더 레이스 메모장 · 편지지 위젯 · 리본 접기 · 방별 저장
@@ -30,11 +30,11 @@ const root=document.createElement('div');root.id='pocket-memo-root';document.doc
 const style=document.createElement('style');style.textContent=`
 #pocket-memo-root{font-family:system-ui,-apple-system,sans-serif;color:#382a49;position:relative;z-index:2147483000}#pocket-memo-root *{box-sizing:border-box}
 #pocket-memo-root button,#pocket-memo-root input,#pocket-memo-root textarea,#pocket-memo-root select{font:inherit}#pocket-memo-root button{border:1px solid #d5bfe8;border-radius:9px;padding:7px 9px;background:#f5edfc;color:#59367d;cursor:pointer}#pocket-memo-root button:disabled{opacity:.5;cursor:not-allowed}
-#pm-launch{position:fixed;right:14px;bottom:90px;width:48px;height:48px;border-radius:50%!important;background:#8152ba!important;color:white!important;font-size:23px!important;z-index:2147483003;box-shadow:0 4px 16px #0004}
-#pm-panel{position:fixed;right:14px;top:7vh;width:min(430px,calc(100vw - 20px));max-height:84dvh;overflow:auto;background:#fffafd;border:1px solid #d8c3ed;border-radius:18px;padding:14px;box-shadow:0 12px 38px #0004;z-index:2147483004}
+#pm-launch{position:fixed;right:14px;bottom:90px;width:48px;height:48px;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%!important;background:#8152ba!important;color:white!important;font-size:23px!important;z-index:2147483003;box-shadow:0 4px 16px #0004}
+#pm-panel{position:fixed;right:14px;top:7vh;width:min(380px,calc(100vw - 20px));max-height:70dvh;overflow:auto;background:#fffafd;border:1px solid #d8c3ed;border-radius:18px;padding:14px;box-shadow:0 12px 38px #0004;z-index:2147483004}
 #pm-panel[hidden],.pm-widget[hidden]{display:none!important}.pm-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0}.pm-row.space{justify-content:space-between}.pm-muted{font-size:12px;color:#7b7086}.pm-input{width:100%;border:1px solid #d2bee3;border-radius:9px;padding:9px;background:#fff;color:#34264a}.pm-card{padding:10px;border:1px solid #e6d9ef;border-radius:12px;background:white;margin:7px 0}.pm-card.active{border-color:#9362c3;background:#faf3ff}.pm-card-title{font-weight:700;font-size:14px}.pm-small{font-size:12px}.pm-label{font-size:12px;font-weight:650;display:block;margin:9px 0 4px}.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.pm-grid input{min-width:0}.pm-separator{border:0;border-top:1px solid #eadff2;margin:13px 0}
 .pm-widget{position:fixed;z-index:2147483002;border:1px solid #c9a6e7;box-shadow:0 6px 25px #0003;padding:9px;display:flex;flex-direction:column;overflow:hidden;min-width:170px;min-height:120px;max-width:100vw;max-height:100dvh}.pm-widget-head{display:flex;align-items:center;justify-content:space-between;gap:4px;touch-action:none;cursor:move;user-select:none}.pm-drag-handle{touch-action:none!important;user-select:none;-webkit-user-select:none;cursor:grab!important;min-width:49px}.pm-widget-head strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;font-size:13px}.pm-widget-actions{display:flex;flex-shrink:0;gap:3px}.pm-widget-actions button{font-size:12px;padding:4px 6px!important;background:#ffffffb8!important;color:#34264a!important}.pm-widget textarea{flex:1;width:100%;min-height:45px;border:0;background:transparent;outline:none;resize:none;margin-top:7px;line-height:1.5}.pm-resize{position:absolute;bottom:0;right:0;width:23px;height:23px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 60%,#9c75bf 61%,#9c75bf 67%,transparent 68%)}
-@media(max-width:650px){#pm-panel{top:auto;bottom:0;left:0;right:0;width:100%;max-height:80dvh;border-radius:18px 18px 0 0}#pm-launch{right:12px;bottom:90px}}
+@media(max-width:650px){#pm-panel{top:auto;bottom:12px;left:5%;right:5%;width:90%;max-height:70dvh;border-radius:18px}#pm-launch{right:12px;bottom:90px}}
 
 /* 1.0.2 Lavender Lace redesign */
 #pm-panel{background:#f9f4ff;border:1px solid #dbc7ec;box-shadow:0 14px 46px #35204745;padding:16px;color:#634b7d;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -69,7 +69,7 @@ const style=document.createElement('style');style.textContent=`
 .pm-fold-button{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border:0!important;border-radius:50%!important;background:transparent!important;font-size:25px!important;padding:0!important;cursor:pointer;touch-action:manipulation}
 .pm-fold-handle{position:absolute;right:51px;top:5px;width:36px;height:36px;border-radius:50%!important;background:#fff7ff!important;color:#795c9a!important;box-shadow:0 2px 8px #0003;touch-action:none!important;cursor:grab!important;padding:0!important}
 .pm-folded .pm-fold-handle[hidden]{display:none!important}
-@media(max-width:650px){#pm-panel{max-height:85dvh;padding:12px}#pm-panel .pm-row{gap:5px}#pm-panel button{font-size:12px}#pm-panel .pm-tabs button{font-size:11px}}
+@media(max-width:650px){#pm-panel{max-height:70dvh;padding:12px}#pm-panel .pm-row{gap:5px}#pm-panel button{font-size:12px}#pm-panel .pm-tabs button{font-size:11px}}
 `;document.head.appendChild(style);
 root.innerHTML='<button id="pm-launch" title="Pocket Memo">📝</button><section id="pm-panel" hidden></section><div id="pm-widgets"></div>';
 const panel=$('#pm-panel',root),widgets=$('#pm-widgets',root);
@@ -201,6 +201,78 @@ async function importFile(file){if(file.size>5*1024*1024){alert('백업 파일�
 const normalize=n=>{const base=newNote();return {...base,...n,id:String(n.id||uid()),title:String(n.title||''),text:String(n.text||''),folder:String(n.folder||''),tags:Array.isArray(n.tags)?n.tags.map(String):[],style:{...base.style,...(n.style&&typeof n.style==='object'?n.style:{})},folded:!!n.folded,emoji:String(n.emoji||'💌'),shown:!!n.shown,positionLocked:!!n.positionLocked,contentLocked:!!n.contentLocked}};
 const folders=incoming.folders.filter(f=>f&&typeof f.id==='string'&&typeof f.name==='string').map(f=>({id:f.id,name:f.name}));const notes=incoming.notes.filter(n=>n&&typeof n==='object').map(normalize);
 if(mode==='2'){data={version:1,folders,notes}}else{const folderIds=new Set(data.folders.map(f=>f.id)),noteIds=new Set(data.notes.map(n=>n.id));for(const f of folders)if(!folderIds.has(f.id)){data.folders.push(f);folderIds.add(f.id)}for(const n of notes)if(!noteIds.has(n.id)){data.notes.push(n);noteIds.add(n.id)}}persist();selected='';render();alert('메모 복원이 완료됐어요.')}
-$('#pm-launch',root).onclick=()=>{changeRoom();panelOpen=!panelOpen;renderPanel()};
+// v1.0.3: movable launcher, separately stored from room notes.
+// Hide it while typing in the chat so iOS desktop-site mode cannot cover the input.
+const launcher=$('#pm-launch',root);
+const launcherKey=PREFIX+'launcher-position';
+let launcherPosition=null, launcherDrag=null, suppressLauncherClick=false;
+try{const saved=JSON.parse(localStorage.getItem(launcherKey)||'null');if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y))launcherPosition=saved}catch(e){}
+function launcherBounds(){
+  const vv=window.visualViewport;
+  return {w:vv?.width||innerWidth,h:vv?.height||innerHeight,
+    x:vv?.offsetLeft||0,y:vv?.offsetTop||0};
+}
+function placeLauncher(){
+  const b=launcherBounds(),size=48,margin=8;
+  let x=launcherPosition?b.x+launcherPosition.x*Math.max(0,b.w-size):b.x+b.w-size-14;
+  let y=launcherPosition?b.y+launcherPosition.y*Math.max(0,b.h-size):b.y+b.h-size-90;
+  x=Math.max(b.x+margin,Math.min(b.x+b.w-size-margin,x));
+  y=Math.max(b.y+margin,Math.min(b.y+b.h-size-margin,y));
+  launcher.style.left=x+'px';launcher.style.top=y+'px';
+  launcher.style.right='auto';launcher.style.bottom='auto';
+}
+function saveLauncherPosition(){
+  const b=launcherBounds(),r=launcher.getBoundingClientRect();
+  launcherPosition={x:Math.max(0,Math.min(1,(r.left-b.x)/Math.max(1,b.w-48))),
+    y:Math.max(0,Math.min(1,(r.top-b.y)/Math.max(1,b.h-48)))};
+  try{localStorage.setItem(launcherKey,JSON.stringify(launcherPosition))}catch(e){console.warn('[Pocket Memo] launcher position',e)}
+}
+function isChatTyping(){
+  const a=document.activeElement;
+  if(!a||root.contains(a))return false;
+  return a.matches?.('textarea,input:not([type=checkbox]):not([type=radio]),[contenteditable="true"],[role="textbox"]')||!!a.closest?.('[contenteditable="true"]');
+}
+function syncLauncherVisibility(){
+  launcher.style.display=isChatTyping()?'none':'';
+  if(!isChatTyping())placeLauncher();
+}
+function launcherBegin(x,y,type,id){
+  if(launcherDrag)return;
+  const r=launcher.getBoundingClientRect();
+  launcherDrag={x,y,left:r.left,top:r.top,type,id,moved:false};
+}
+function launcherMove(x,y){
+  const a=launcherDrag;if(!a)return;
+  const dx=x-a.x,dy=y-a.y;
+  if(Math.abs(dx)+Math.abs(dy)>5)a.moved=true;
+  if(!a.moved)return;
+  const b=launcherBounds();
+  launcher.style.left=Math.max(b.x+8,Math.min(b.x+b.w-56,a.left+dx))+'px';
+  launcher.style.top=Math.max(b.y+8,Math.min(b.y+b.h-56,a.top+dy))+'px';
+}
+function launcherFinish(){
+  if(!launcherDrag)return;
+  if(launcherDrag.moved){saveLauncherPosition();suppressLauncherClick=true;}
+  launcherDrag=null;
+}
+launcher.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const t=e.changedTouches[0];launcherBegin(t.clientX,t.clientY,'touch',t.identifier)},{passive:true});
+launcher.addEventListener('touchmove',e=>{if(launcherDrag?.type!=='touch')return;const t=[...e.changedTouches].find(t=>t.identifier===launcherDrag.id);if(!t)return;launcherMove(t.clientX,t.clientY);if(launcherDrag?.moved&&e.cancelable)e.preventDefault()},{passive:false});
+launcher.addEventListener('touchend',e=>{if(launcherDrag?.type==='touch'&&[...e.changedTouches].some(t=>t.identifier===launcherDrag.id))launcherFinish()});
+launcher.addEventListener('touchcancel',launcherFinish);
+launcher.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0)return;launcherBegin(e.clientX,e.clientY,'pointer',e.pointerId);try{launcher.setPointerCapture(e.pointerId)}catch(err){}});
+launcher.addEventListener('pointermove',e=>{if(launcherDrag?.type==='pointer'&&launcherDrag.id===e.pointerId)launcherMove(e.clientX,e.clientY)});
+launcher.addEventListener('pointerup',e=>{if(launcherDrag?.type==='pointer'&&launcherDrag.id===e.pointerId)launcherFinish()});
+launcher.addEventListener('pointercancel',launcherFinish);
+launcher.addEventListener('click',e=>{
+  if(suppressLauncherClick){suppressLauncherClick=false;e.preventDefault();return;}
+  changeRoom();panelOpen=!panelOpen;renderPanel();
+});
+document.addEventListener('focusin',syncLauncherVisibility,true);
+document.addEventListener('focusout',()=>setTimeout(syncLauncherVisibility,80),true);
+window.addEventListener('resize',syncLauncherVisibility,{passive:true});
+window.addEventListener('orientationchange',syncLauncherVisibility,{passive:true});
+window.visualViewport?.addEventListener('resize',syncLauncherVisibility,{passive:true});
+window.visualViewport?.addEventListener('scroll',syncLauncherVisibility,{passive:true});
+placeLauncher();
 data=read(current);render();setInterval(changeRoom,900);
 })();
