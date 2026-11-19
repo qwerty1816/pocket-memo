@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pocket Memo 💜
 // @namespace    pocket-memo-independent
-// @version      1.0.10
+// @version      1.0.12
 // @updateURL    https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @downloadURL  https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @description  라벤더 레이스 메모장 · 편지지 위젯 · 리본 접기 · 방별 저장
@@ -75,11 +75,11 @@ const root=document.createElement('div');root.id='pocket-memo-root';document.doc
 const style=document.createElement('style');style.textContent=`
 #pocket-memo-root{font-family:system-ui,-apple-system,sans-serif;color:#382a49;position:relative;z-index:2147483000}#pocket-memo-root *{box-sizing:border-box}
 #pocket-memo-root button,#pocket-memo-root input,#pocket-memo-root textarea,#pocket-memo-root select{font:inherit}#pocket-memo-root button{border:1px solid #d5bfe8;border-radius:9px;padding:7px 9px;background:#f5edfc;color:#59367d;cursor:pointer}#pocket-memo-root button:disabled{opacity:.5;cursor:not-allowed}
-#pm-launch{position:fixed;right:14px;bottom:90px;width:48px;height:48px;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%!important;background:#8152ba!important;color:white!important;font-size:23px!important;z-index:2147483003;box-shadow:0 4px 16px #0004}
+#pm-launch{position:fixed;right:14px;bottom:180px;width:40px;height:40px;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%!important;background:#8152ba!important;color:white!important;font-size:19px!important;padding:0!important;z-index:2147483003;box-shadow:0 4px 16px #0004}
 #pm-panel{position:fixed;right:14px;top:7vh;width:min(380px,calc(100vw - 20px));max-height:70dvh;overflow:auto;background:#fffafd;border:1px solid #d8c3ed;border-radius:18px;padding:14px;box-shadow:0 12px 38px #0004;z-index:2147483004}
 #pm-panel[hidden],.pm-widget[hidden]{display:none!important}.pm-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0}.pm-row.space{justify-content:space-between}.pm-muted{font-size:12px;color:#7b7086}.pm-input{width:100%;border:1px solid #d2bee3;border-radius:9px;padding:9px;background:#fff;color:#34264a}.pm-card{padding:10px;border:1px solid #e6d9ef;border-radius:12px;background:white;margin:7px 0}.pm-card.active{border-color:#9362c3;background:#faf3ff}.pm-card-title{font-weight:700;font-size:14px}.pm-small{font-size:12px}.pm-label{font-size:12px;font-weight:650;display:block;margin:9px 0 4px}.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.pm-grid input{min-width:0}.pm-separator{border:0;border-top:1px solid #eadff2;margin:13px 0}
 .pm-widget{position:fixed;z-index:2147483002;border:1px solid #c9a6e7;box-shadow:0 6px 25px #0003;padding:9px;display:flex;flex-direction:column;overflow:hidden;min-width:170px;min-height:120px;max-width:100vw;max-height:100dvh}.pm-widget-head{display:flex;align-items:center;justify-content:space-between;gap:4px;touch-action:none;cursor:move;user-select:none}.pm-drag-handle{touch-action:none!important;user-select:none;-webkit-user-select:none;cursor:grab!important;min-width:49px}.pm-widget-head strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;font-size:13px}.pm-widget-actions{display:flex;flex-shrink:0;gap:3px}.pm-widget-actions button{font-size:12px;padding:4px 6px!important;background:#ffffffb8!important;color:#34264a!important}.pm-widget textarea{flex:1;width:100%;min-height:45px;border:0;background:transparent;outline:none;resize:none;margin-top:7px;line-height:1.5}.pm-resize{position:absolute;bottom:0;right:0;width:23px;height:23px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 60%,#9c75bf 61%,#9c75bf 67%,transparent 68%)}
-@media(max-width:650px){#pm-panel{top:auto;bottom:8px;left:3%;right:3%;width:94%;max-height:calc(100dvh - 24px);border-radius:18px}#pm-launch{right:12px;bottom:90px}}
+@media(max-width:650px){#pm-panel{top:auto;bottom:8px;left:3%;right:3%;width:94%;max-height:calc(100dvh - 24px);border-radius:18px}#pm-launch{right:14px;bottom:180px}}
 
 /* 1.0.2 Lavender Lace redesign */
 #pm-panel{background:#f9f4ff;border:1px solid #dbc7ec;box-shadow:0 14px 46px #35204745;padding:16px;color:#634b7d;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -110,9 +110,9 @@ const style=document.createElement('style');style.textContent=`
 .pm-widget .pm-drag-handle{min-width:30px!important}
 .pm-widget .pm-paperline{padding:1px 9px;text-align:center;font-size:10px;opacity:.65;pointer-events:none}
 .pm-widget textarea{margin:0!important;padding:8px 11px 20px;min-height:0!important;line-height:1.55}
-.pm-widget.pm-folded{min-width:0!important;min-height:0!important;width:48px!important;height:48px!important;border-radius:50%!important;overflow:visible!important;box-shadow:0 3px 14px #0004;background:var(--pm-header,#d7b9ed)!important;opacity:1!important}
-.pm-fold-button{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border:0!important;border-radius:50%!important;background:transparent!important;font-size:25px!important;padding:0!important;cursor:pointer;touch-action:manipulation}
-.pm-fold-handle{position:absolute;right:51px;top:5px;width:36px;height:36px;border-radius:50%!important;background:#fff7ff!important;color:#795c9a!important;box-shadow:0 2px 8px #0003;touch-action:none!important;cursor:grab!important;padding:0!important}
+.pm-widget.pm-folded{min-width:0!important;min-height:0!important;width:40px!important;height:40px!important;border-radius:50%!important;overflow:visible!important;box-shadow:0 3px 14px #0004;background:var(--pm-header,#d7b9ed)!important;opacity:1!important}
+.pm-fold-button{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border:0!important;border-radius:50%!important;background:transparent!important;font-size:21px!important;padding:0!important;cursor:grab;touch-action:none}
+.pm-fold-handle{position:absolute;left:43px;right:auto;top:4px;width:32px;height:32px;border-radius:50%!important;background:#fff7ff!important;color:#795c9a!important;box-shadow:0 2px 8px #0003;touch-action:none!important;cursor:grab!important;padding:0!important}
 .pm-folded .pm-fold-handle[hidden]{display:none!important}
 @media(max-width:650px){#pm-panel{max-height:calc(100dvh - 24px);padding:12px}#pm-panel .pm-row{gap:5px}#pm-panel button{font-size:12px}#pm-panel .pm-tabs button{font-size:11px}}
 .pm-read-body{height:auto;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;padding:12px;background:#fff;border:1px solid #e8d8f1;border-radius:12px;user-select:text;-webkit-user-select:text}.pm-read-body:empty:before{content:'내용이 없어요';color:#887b92}.pm-read-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.pm-editor textarea{max-height:none}#pm-panel{overscroll-behavior:contain}@media(max-width:650px){#pm-panel{max-height:calc(100dvh - 24px)!important}}
@@ -138,9 +138,9 @@ document.head.appendChild(style);
 root.innerHTML='<button id="pm-launch" title="Pocket Memo">📝</button><section id="pm-panel" hidden></section><div id="pm-widgets"></div>';
 const panel=$('#pm-panel',root),widgets=$('#pm-widgets',root);
 function update(n,fields){Object.assign(n,fields,{updated:Date.now()});persist()}
-function changeRoom(){const next=room();if(next===current)return;current=next;data=read(current);selected='';filter='';folderFilter='';viewMode='read';render();}
-function render(){renderPanel();renderWidgets()}
-function renderPanel(){panel.hidden=!panelOpen;if(!panelOpen)return;
+function changeRoom(){const next=room();if(next===current){syncLauncherVisibility();return;}current=next;data=read(current);selected='';filter='';folderFilter='';viewMode='read';foldMoveId='';panelOpen=false;render();syncLauncherVisibility();}
+function render(){renderPanel();renderWidgets();syncLauncherVisibility()}
+function renderPanel(){panel.hidden=!panelOpen||!current;if(!panelOpen)return;
 if(!current){panel.innerHTML='<div class="pm-row space"><b>📒 Pocket Memo</b><button data-action="close">닫기</button></div><p>RP 채팅방에서 메모를 사용할 수 있어요.</p>';bindPanel();return}
 const visible=data.notes.filter(n=>(!folderFilter||n.folder===folderFilter)&&(n.title+' '+n.text+' '+n.tags.join(' ')).toLocaleLowerCase().includes(filter.toLocaleLowerCase())).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.updated-a.updated);
 const n=noteById(selected);
@@ -169,7 +169,7 @@ ${markerEditor(n)}${emojiPicker(n)}
 <label class="pm-label">무늬 진하기 (${Math.max(0,Math.min(100,Number(n.style.patternStrength??35)))}%)<input id="pm-pattern-strength" class="pm-input" type="range" min="0" max="100" step="5" value="${Math.max(0,Math.min(100,Number(n.style.patternStrength??35)))}"></label>
 </div>
 <label class="pm-label">투명도 (${n.style.opacity}%)<input id="pm-opacity" class="pm-input" type="range" min="30" max="100" value="${n.style.opacity}"></label><label class="pm-label">글자 크기 (${n.style.fontSize}px)<input id="pm-fontsize" class="pm-input" type="range" min="11" max="24" value="${n.style.fontSize}"></label><label class="pm-label">모서리 (${n.style.radius}px)<input id="pm-radius" class="pm-input" type="range" min="0" max="30" value="${n.style.radius}"></label>`:''}
-${editorTab==='settings'?`<label class="pm-switch">📌 상단 고정 <input id="pm-pinned" type="checkbox" ${n.pinned?'checked':''}></label><label class="pm-switch">💌 위젯 표시 <input id="pm-shown" type="checkbox" ${n.shown?'checked':''}></label><label class="pm-switch">🔑 위치·크기 잠금 <input id="pm-poslock" type="checkbox" ${n.positionLocked?'checked':''}></label><label class="pm-switch">📄🔒 위젯 내용 수정 잠금 <input id="pm-contentlock" type="checkbox" ${n.contentLocked?'checked':''}></label><label class="pm-switch">🎀 쪽지로 접기 <input id="pm-folded" type="checkbox" ${n.folded?'checked':''}></label>${n.folded&&!n.positionLocked?`<button data-action="move-folded">✥ 접힌 쪽지 이동 손잡이 ${foldMoveId===n.id?'숨기기':'표시'}</button>`:''}<div class="pm-muted">잠금 기능은 서로 독립적이에요. 접힌 쪽지 이동은 위치 잠금 해제 시 가능합니다.</div>`:''}
+${editorTab==='settings'?`<label class="pm-switch">📌 상단 고정 <input id="pm-pinned" type="checkbox" ${n.pinned?'checked':''}></label><label class="pm-switch">💌 위젯 표시 <input id="pm-shown" type="checkbox" ${n.shown?'checked':''}></label><label class="pm-switch">🔑 위치·크기 잠금 <input id="pm-poslock" type="checkbox" ${n.positionLocked?'checked':''}></label><label class="pm-switch">📄🔒 위젯 내용 수정 잠금 <input id="pm-contentlock" type="checkbox" ${n.contentLocked?'checked':''}></label><label class="pm-switch">🎀 쪽지로 접기 <input id="pm-folded" type="checkbox" ${n.folded?'checked':''}></label><div class="pm-muted">잠금 기능은 서로 독립적이에요. 접힌 쪽지는 위치 잠금이 꺼져 있으면 리본을 직접 끌어서 이동할 수 있어요.</div>`:''}
 ` }
 </div>`:''}
 <input id="pm-import-file" type="file" accept=".json,application/json" hidden>`;
@@ -201,19 +201,69 @@ for(const [id,prop] of [['pm-bg','bg'],['pm-fg','fg'],['pm-header-color','header
 function renderWidgets(){widgets.replaceChildren();if(!current)return;for(const n of data.notes.filter(n=>n.shown)){
 const el=document.createElement('section');el.className='pm-widget'+(n.folded?' pm-folded':'');el.dataset.id=n.id;
 const bg=n.style?.bg||'#fff8fe',fg=n.style?.fg||'#34264a',header=n.style?.header||'#f1ddf5';
-const dp=getDevicePos(n)||n;const w=Math.max(170,Math.min(innerWidth-12,Number(dp.width)||270)),h=Math.max(120,Math.min(innerHeight-12,Number(dp.height)||210));const x=Math.max(0,Math.min(innerWidth-(n.folded?48:Math.min(w,60)),Number(dp.x)||0)),y=Math.max(0,Math.min(innerHeight-(n.folded?48:Math.min(h,50)),Number(dp.y)||0));
-el.style.cssText=`left:${x}px;top:${y}px;width:${n.folded?48:w}px;height:${n.folded?48:h}px;${n.folded?`background:${bg};`:paperCss(n.style)}color:${fg};opacity:${n.folded?1:n.style.opacity/100};border-radius:${n.folded?50:n.style.radius}px;font-size:${n.style.fontSize}px;--pm-header:${header}`;
+const dp=getDevicePos(n)||n;const w=Math.max(170,Math.min(innerWidth-12,Number(dp.width)||270)),h=Math.max(120,Math.min(innerHeight-12,Number(dp.height)||210));const x=Math.max(0,Math.min(innerWidth-(n.folded?40:Math.min(w,60)),Number(dp.x)||0)),y=Math.max(0,Math.min(innerHeight-(n.folded?40:Math.min(h,50)),Number(dp.y)||0));
+el.style.cssText=`left:${x}px;top:${y}px;width:${n.folded?40:w}px;height:${n.folded?40:h}px;${n.folded?`background:${bg};`:paperCss(n.style)}color:${fg};opacity:${n.folded?1:n.style.opacity/100};border-radius:${n.folded?50:n.style.radius}px;font-size:${n.style.fontSize}px;--pm-header:${header}`;
 if(n.folded){
  el.innerHTML=`<button class="pm-fold-button" type="button" title="메모 펼치기">🎀</button><button class="pm-fold-handle" type="button" title="끌어서 위치 이동" ${n.positionLocked?'disabled':''} ${foldMoveId===n.id&&!n.positionLocked?'':'hidden'}>✥</button>`;
  const fold=$('.pm-fold-button',el),handle=$('.pm-fold-handle',el);
- // A tap opens the note; a secondary long-press or right click exposes a drag handle.
- let holdTimer=0,held=false;
- fold.addEventListener('touchstart',()=>{held=false;holdTimer=setTimeout(()=>{held=true;if(!n.positionLocked){foldMoveId=n.id;renderWidgets()}},550)},{passive:true});
- fold.addEventListener('touchend',()=>clearTimeout(holdTimer),{passive:true});
- fold.addEventListener('touchmove',()=>clearTimeout(holdTimer),{passive:true});
- fold.onclick=e=>{if(held){e.preventDefault();held=false;return}foldMoveId='';update(n,{folded:false});render()};
- fold.oncontextmenu=e=>{e.preventDefault();if(n.positionLocked)return;foldMoveId=foldMoveId===n.id?'':n.id;renderWidgets()};
- if(!n.positionLocked){attachDrag(handle,el,n,'move',false);}
+ // Drag the folded ribbon itself; a short tap still unfolds it.
+ let activeFold=null, suppressFoldClick=false;
+ const foldStart=(x,y,type,id)=>{
+   if(n.positionLocked)return;
+   const r=el.getBoundingClientRect();
+   activeFold={x,y,type,id,left:r.left,top:r.top,moved:false};
+ };
+ const foldMove=(x,y)=>{
+   if(!activeFold)return;
+   const dx=x-activeFold.x,dy=y-activeFold.y;
+   if(!activeFold.moved&&Math.hypot(dx,dy)<7)return;
+   activeFold.moved=true;
+   el.style.left=Math.max(0,Math.min(innerWidth-40,activeFold.left+dx))+'px';
+   el.style.top=Math.max(0,Math.min(innerHeight-40,activeFold.top+dy))+'px';
+ };
+ const foldFinish=()=>{
+   if(!activeFold)return;
+   const moved=activeFold.moved;
+   activeFold=null;
+   if(moved){
+     suppressFoldClick=true;
+     update(n,{x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0});
+     saveDevicePos(n);
+   }
+ };
+ fold.addEventListener('touchstart',e=>{
+   if(e.touches.length!==1)return;
+   const t=e.changedTouches[0];foldStart(t.clientX,t.clientY,'touch',t.identifier);
+ },{passive:true});
+ fold.addEventListener('touchmove',e=>{
+   if(activeFold?.type!=='touch')return;
+   const t=[...e.changedTouches].find(t=>t.identifier===activeFold.id);
+   if(!t)return;
+   if(e.cancelable)e.preventDefault();
+   foldMove(t.clientX,t.clientY);
+ },{passive:false});
+ fold.addEventListener('touchend',e=>{
+   if(activeFold?.type==='touch'&&[...e.changedTouches].some(t=>t.identifier===activeFold.id))foldFinish();
+ });
+ fold.addEventListener('touchcancel',foldFinish);
+ fold.addEventListener('pointerdown',e=>{
+   if(e.pointerType==='touch'||e.button!==0)return;
+   foldStart(e.clientX,e.clientY,'pointer',e.pointerId);
+   try{fold.setPointerCapture(e.pointerId)}catch{}
+ });
+ fold.addEventListener('pointermove',e=>{
+   if(activeFold?.type==='pointer'&&activeFold.id===e.pointerId)foldMove(e.clientX,e.clientY);
+ });
+ fold.addEventListener('pointerup',e=>{
+   if(activeFold?.type==='pointer'&&activeFold.id===e.pointerId)foldFinish();
+ });
+ fold.addEventListener('pointercancel',foldFinish);
+ fold.onclick=e=>{
+   if(suppressFoldClick){e.preventDefault();suppressFoldClick=false;return}
+   foldMoveId='';update(n,{folded:false});render();
+ };
+ fold.oncontextmenu=e=>e.preventDefault();
+
 }else{
  el.innerHTML=`<div class="pm-widget-head"><strong>${esc(n.emoji||'💌')} ${esc(n.title)}</strong><div class="pm-widget-actions"><button data-action="read-toggle" title="읽기 / 내용 수정 전환">🖍️</button><button data-action="fold" title="리본으로 접기">▾</button><button class="pm-drag-handle" type="button" title="누른 채 이동" ${n.positionLocked?'disabled':''}>✥</button><button data-action="position" title="위치·크기 잠금">${n.positionLocked?'🔐':'🔓'}</button><button data-action="content" title="위젯 내용 수정 잠금">${n.contentLocked?'📄🔒':'📝'}</button><button data-action="hide" title="위젯 숨기기">×</button></div></div><div class="pm-paperline">✉ ───── ♡ ───── ✉</div><div class="pm-widget-read" hidden></div><textarea placeholder="메모 내용" ${n.contentLocked?'readonly':''}></textarea>${n.positionLocked?'':'<div class="pm-resize" title="크기 조절"></div>'}`;
  const ta=$('textarea',el),readEl=$('.pm-widget-read',el);ta.value=n.text;ta.style.color=fg;readEl.innerHTML=highlightedHtml(n);readEl.hidden=false;ta.hidden=true;ta.oninput=()=>{update(n,{text:ta.value});readEl.innerHTML=highlightedHtml(n);const editor=$('#pm-text',panel);if(editor&&selected===n.id&&document.activeElement!==editor)editor.value=n.text};
@@ -237,8 +287,8 @@ function attachDrag(handle,el,n,kind,ignoreButtons){
     const dx=x-active.x,dy=y-active.y;
     if(Math.abs(dx)+Math.abs(dy)>3)active.moved=true;
     if(kind==='move'){
-      el.style.left=Math.max(0,Math.min(innerWidth-50,active.left+dx))+'px';
-      el.style.top=Math.max(0,Math.min(innerHeight-40,active.top+dy))+'px';
+      el.style.left=Math.max(0,Math.min(innerWidth-(n.folded?40:50),active.left+dx))+'px';
+      el.style.top=Math.max(0,Math.min(innerHeight-(n.folded?40:40),active.top+dy))+'px';
     }else{
       el.style.width=Math.max(170,Math.min(innerWidth-active.left,active.width+dx))+'px';
       el.style.height=Math.max(120,Math.min(innerHeight-active.top,active.height+dy))+'px';
@@ -288,7 +338,7 @@ const oldData=JSON.parse(JSON.stringify(data));if(mode==='2'){data={version:1,fo
 // v1.0.3: movable launcher, separately stored from room notes.
 // Hide it while typing in the chat so iOS desktop-site mode cannot cover the input.
 const launcher=$('#pm-launch',root);
-const launcherKey=PREFIX+'launcher-position';
+const launcherKey=PREFIX+'launcher-position:v2';
 let launcherPosition=null, launcherDrag=null, suppressLauncherClick=false;
 try{const saved=JSON.parse(localStorage.getItem(launcherKey)||'null');if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y))launcherPosition=saved}catch(e){}
 function launcherBounds(){
@@ -297,9 +347,9 @@ function launcherBounds(){
     x:vv?.offsetLeft||0,y:vv?.offsetTop||0};
 }
 function placeLauncher(){
-  const b=launcherBounds(),size=48,margin=8;
+  const b=launcherBounds(),size=40,margin=8;
   let x=launcherPosition?b.x+launcherPosition.x*Math.max(0,b.w-size):b.x+b.w-size-14;
-  let y=launcherPosition?b.y+launcherPosition.y*Math.max(0,b.h-size):b.y+b.h-size-90;
+  let y=launcherPosition?b.y+launcherPosition.y*Math.max(0,b.h-size):b.y+b.h-size-180;
   x=Math.max(b.x+margin,Math.min(b.x+b.w-size-margin,x));
   y=Math.max(b.y+margin,Math.min(b.y+b.h-size-margin,y));
   launcher.style.left=x+'px';launcher.style.top=y+'px';
@@ -307,8 +357,8 @@ function placeLauncher(){
 }
 function saveLauncherPosition(){
   const b=launcherBounds(),r=launcher.getBoundingClientRect();
-  launcherPosition={x:Math.max(0,Math.min(1,(r.left-b.x)/Math.max(1,b.w-48))),
-    y:Math.max(0,Math.min(1,(r.top-b.y)/Math.max(1,b.h-48)))};
+  launcherPosition={x:Math.max(0,Math.min(1,(r.left-b.x)/Math.max(1,b.w-40))),
+    y:Math.max(0,Math.min(1,(r.top-b.y)/Math.max(1,b.h-40)))};
   try{localStorage.setItem(launcherKey,JSON.stringify(launcherPosition))}catch(e){console.warn('[Pocket Memo] launcher position',e)}
 }
 function isChatTyping(){
@@ -317,8 +367,8 @@ function isChatTyping(){
   return a.matches?.('textarea,input:not([type=checkbox]):not([type=radio]),[contenteditable="true"],[role="textbox"]')||!!a.closest?.('[contenteditable="true"]');
 }
 function syncLauncherVisibility(){
-  launcher.style.display=isChatTyping()?'none':'';
-  if(!isChatTyping())placeLauncher();
+  launcher.style.display=(!current||isChatTyping())?'none':'';
+  if(current&&!isChatTyping())placeLauncher();
 }
 function launcherBegin(x,y,type,id){
   if(launcherDrag)return;
@@ -331,8 +381,8 @@ function launcherMove(x,y){
   if(Math.abs(dx)+Math.abs(dy)>5)a.moved=true;
   if(!a.moved)return;
   const b=launcherBounds();
-  launcher.style.left=Math.max(b.x+8,Math.min(b.x+b.w-56,a.left+dx))+'px';
-  launcher.style.top=Math.max(b.y+8,Math.min(b.y+b.h-56,a.top+dy))+'px';
+  launcher.style.left=Math.max(b.x+8,Math.min(b.x+b.w-48,a.left+dx))+'px';
+  launcher.style.top=Math.max(b.y+8,Math.min(b.y+b.h-48,a.top+dy))+'px';
 }
 function launcherFinish(){
   if(!launcherDrag)return;
@@ -357,6 +407,5 @@ window.addEventListener('resize',()=>{syncLauncherVisibility();renderWidgets()},
 window.addEventListener('orientationchange',syncLauncherVisibility,{passive:true});
 window.visualViewport?.addEventListener('resize',syncLauncherVisibility,{passive:true});
 window.visualViewport?.addEventListener('scroll',syncLauncherVisibility,{passive:true});
-placeLauncher();
-data=read(current);render();setInterval(changeRoom,900);
+data=read(current);render();setInterval(changeRoom,500);window.addEventListener('popstate',changeRoom);window.addEventListener('hashchange',changeRoom);
 })();
