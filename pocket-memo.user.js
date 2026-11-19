@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pocket Memo 💜
 // @namespace    pocket-memo-independent
-// @version      1.0.12
+// @version      1.0.13
 // @updateURL    https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @downloadURL  https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @description  라벤더 레이스 메모장 · 편지지 위젯 · 리본 접기 · 방별 저장
@@ -134,6 +134,7 @@ const style=document.createElement('style');style.textContent=`
 #pocket-memo-root .pm-widget-read{flex:1;min-height:0;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:7px;line-height:1.5;user-select:text;-webkit-user-select:text}
 #pocket-memo-root .pm-widget-read[hidden],#pocket-memo-root .pm-widget textarea[hidden]{display:none!important}
 `;
+style.textContent+=`#pocket-memo-root .pm-widget-edit-actions{display:flex;justify-content:flex-end;gap:6px;padding:5px 8px 8px}#pocket-memo-root .pm-widget-edit-actions[hidden]{display:none!important}#pocket-memo-root .pm-widget textarea:not([hidden]){display:block!important;flex:1;min-height:0!important;overflow:auto!important;user-select:text!important;-webkit-user-select:text!important;touch-action:auto!important}#pocket-memo-root .pm-widget textarea[hidden]{display:none!important}`;
 document.head.appendChild(style);
 root.innerHTML='<button id="pm-launch" title="Pocket Memo">📝</button><section id="pm-panel" hidden></section><div id="pm-widgets"></div>';
 const panel=$('#pm-panel',root),widgets=$('#pm-widgets',root);
@@ -265,9 +266,33 @@ if(n.folded){
  fold.oncontextmenu=e=>e.preventDefault();
 
 }else{
- el.innerHTML=`<div class="pm-widget-head"><strong>${esc(n.emoji||'💌')} ${esc(n.title)}</strong><div class="pm-widget-actions"><button data-action="read-toggle" title="읽기 / 내용 수정 전환">🖍️</button><button data-action="fold" title="리본으로 접기">▾</button><button class="pm-drag-handle" type="button" title="누른 채 이동" ${n.positionLocked?'disabled':''}>✥</button><button data-action="position" title="위치·크기 잠금">${n.positionLocked?'🔐':'🔓'}</button><button data-action="content" title="위젯 내용 수정 잠금">${n.contentLocked?'📄🔒':'📝'}</button><button data-action="hide" title="위젯 숨기기">×</button></div></div><div class="pm-paperline">✉ ───── ♡ ───── ✉</div><div class="pm-widget-read" hidden></div><textarea placeholder="메모 내용" ${n.contentLocked?'readonly':''}></textarea>${n.positionLocked?'':'<div class="pm-resize" title="크기 조절"></div>'}`;
- const ta=$('textarea',el),readEl=$('.pm-widget-read',el);ta.value=n.text;ta.style.color=fg;readEl.innerHTML=highlightedHtml(n);readEl.hidden=false;ta.hidden=true;ta.oninput=()=>{update(n,{text:ta.value});readEl.innerHTML=highlightedHtml(n);const editor=$('#pm-text',panel);if(editor&&selected===n.id&&document.activeElement!==editor)editor.value=n.text};
- el.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{const a=b.dataset.action;if(a==='hide')update(n,{shown:false});if(a==='position')update(n,{positionLocked:!n.positionLocked});if(a==='content')update(n,{contentLocked:!n.contentLocked});if(a==='fold')update(n,{folded:true});if(a==='read-toggle'){const showing=readEl.hidden;readEl.hidden=!showing;ta.hidden=showing;return}render()});
+ el.innerHTML=`<div class="pm-widget-head"><strong>${esc(n.emoji||'💌')} ${esc(n.title)}</strong><div class="pm-widget-actions"><button data-action="read-toggle" title="위젯에서 내용 수정">✏️</button><button data-action="fold" title="리본으로 접기">▾</button><button class="pm-drag-handle" type="button" title="누른 채 이동" ${n.positionLocked?'disabled':''}>✥</button><button data-action="position" title="위치·크기 잠금">${n.positionLocked?'🔐':'🔓'}</button><button data-action="content" title="위젯 내용 수정 잠금">${n.contentLocked?'📄🔒':'📝'}</button><button data-action="hide" title="위젯 숨기기">×</button></div></div><div class="pm-paperline">✉ ───── ♡ ───── ✉</div><div class="pm-widget-read"></div><textarea placeholder="메모 내용" hidden></textarea><div class="pm-widget-edit-actions" hidden><button type="button" data-action="cancel-edit">취소</button><button type="button" data-action="save-edit">💾 저장</button></div>${n.positionLocked?'':'<div class="pm-resize" title="크기 조절"></div>'}`;
+ const ta=$('textarea',el),readEl=$('.pm-widget-read',el),editActions=$('.pm-widget-edit-actions',el),editButton=$('[data-action="read-toggle"]',el);
+ let editing=false;
+ ta.value=n.text;ta.style.color=fg;readEl.innerHTML=highlightedHtml(n);
+ const setEditing=on=>{editing=on;readEl.hidden=on;ta.hidden=!on;editActions.hidden=!on;editButton.textContent=on?'📖':'✏️';editButton.title=on?'읽기로 돌아가기':'위젯에서 내용 수정';if(on){ta.value=n.text;ta.focus()}else{readEl.innerHTML=highlightedHtml(n)}};
+ el.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{
+  const a=b.dataset.action;
+  if(a==='read-toggle'){
+   if(editing){if(ta.value!==n.text&&!confirm('저장하지 않은 수정 내용을 버릴까요?'))return;setEditing(false)}
+   else{if(n.contentLocked){alert('내용 수정 잠금이 켜져 있어요. 📝 버튼으로 잠금을 해제해 주세요.');return}setEditing(true)}
+   return;
+  }
+  if(a==='save-edit'){
+   if(n.contentLocked){alert('내용 수정 잠금이 켜져 있어요.');return}
+   if(ta.value!==n.text){const previous=n.text;update(n,{text:ta.value});if(saveFailed){n.text=previous;return}}
+   setEditing(false);
+   const editor=$('#pm-text',panel);if(editor&&selected===n.id&&document.activeElement!==editor)editor.value=n.text;
+   return;
+  }
+  if(a==='cancel-edit'){if(ta.value!==n.text&&!confirm('수정 내용을 버릴까요?'))return;setEditing(false);return}
+  if(editing&&ta.value!==n.text&&!confirm('저장하지 않은 수정 내용이 있어요. 계속할까요?'))return;
+  if(a==='hide')update(n,{shown:false});
+  if(a==='position')update(n,{positionLocked:!n.positionLocked});
+  if(a==='content')update(n,{contentLocked:!n.contentLocked});
+  if(a==='fold')update(n,{folded:true});
+  render();
+ });
  if(!n.positionLocked){attachDrag($('.pm-drag-handle',el),el,n,'move',false);const grip=$('.pm-resize',el);if(grip)attachDrag(grip,el,n,'resize',false)}
 }
 widgets.appendChild(el);
