@@ -671,4 +671,3 @@ const pcCss=document.createElement('style');pcCss.textContent=`#pm-panel .pc-swi
 
 data=read(current);calLoad();checkLoad();render();pcRenderWidget();checkRenderSeparateWidget();setInterval(changeRoom,500);window.addEventListener('popstate',changeRoom);window.addEventListener('hashchange',changeRoom);
 })();
-
