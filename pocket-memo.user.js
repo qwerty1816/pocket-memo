@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pocket Memo 💜
 // @namespace    pocket-memo-independent
-// @version      1.1.11
+// @version      1.1.12
 // @updateURL    https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @downloadURL  https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo.user.js
 // @icon         https://raw.githubusercontent.com/qwerty1816/pocket-memo/main/pocket-memo-icon.png
@@ -534,7 +534,7 @@ function bindCalendar(){panel.querySelectorAll('[data-pc-tab]').forEach(b=>b.onc
 
 // Checklist: room-local, with independent or event-linked lists.
 function pmCheckLists(){return checklist.lists.filter(x=>x.timeline===checklistTimeline)}
-let checkEditorTab='content',checkCreating=false,checkEditingItem=-1,checkEditingTitle=false,checkCustomEmojis=[],checkItemEmojiPicker=false;
+let checkEditorTab='content',checkCreating=false,checkEditingItem=-1,checkEditingTitle=false,checkCustomEmojis=[],checkItemEmojiPicker=false,checkContentDecorOpen=false;
 const checkEmojiBase=['💌','🎀','🌷','💍','💜','💕','🦋','🌙','⭐','🎂','🎁','📖','📍','🗓️','🕊️','🥀','🌸','🧸','🍀','☕','✈️','🏠','💐','✨','🔎','🏥','📜','⚖️','🗝️'];
 const checkFmtDefaults=()=>({'==':{highlight:true,bold:false,underline:false,color:'#FFE878'},'**':{highlight:false,bold:true,underline:false,color:'#D9C5FF'}});
 function checkFormats(l){return {'==':{...checkFmtDefaults()['=='],...(l.formats?.['==']||{})},'**':{...checkFmtDefaults()['**'],...(l.formats?.['**']||{})}}}
@@ -559,7 +559,7 @@ function pmChecklistHtml(widget=false){
  <div class="pm-muted">${selected.eventId?'📅 '+pcEsc(cal.events.find(e=>e.id===selected.eventId)?.title||'연결된 일정 없음'):'📝 독립형 체크리스트'}</div>
  ${widget?'':`<div class="pm-tabs"><button data-check-tab="content" class="${checkEditorTab==='content'?'active':''}">💌 내용·분류</button><button data-check-tab="style" class="${checkEditorTab==='style'?'active':''}">🎨 꾸미기</button><button data-check-tab="settings" class="${checkEditorTab==='settings'?'active':''}">🔐 설정</button></div>`}
  ${widget||checkEditorTab==='content'?`${pmCheckItemHtml(selected)}${!selected.locked?`<div class="pm-row"><input class="pm-input pm-check-new-input" data-check-new-input placeholder="새 항목 입력"><button type="button" data-check-action="add-item">＋ 추가</button></div>`:''}
- ${widget?'':`<label class="pm-label">달력 일정 연결 (선택)</label><select class="pm-input" data-check-event ${selected.locked?'disabled':''}><option value="">연결하지 않음</option>${options}</select><div class="pm-row"><button data-check-action="edit-title" ${selected.locked?'disabled':''}>✏️ 목록 이름</button><button data-check-action="delete">🗑️ 목록 삭제</button></div>${checkEditingTitle?`<div class="pm-row"><input class="pm-input pm-check-new-input" data-check-title-value value="${pcEsc(selected.title)}"><button data-check-action="save-title">저장</button><button data-check-action="cancel-title">취소</button></div>`:''}`}`:''}
+ ${widget?'':`<div class="pm-row"><button type="button" data-check-action="toggle-content-decor" aria-expanded="${checkContentDecorOpen?'true':'false'}">🎨 이모티콘 · 텍스트 꾸미기 ${checkContentDecorOpen?'▴':'▾'}</button></div>${checkContentDecorOpen?`<div class="pm-check-inline-decor">${checkDecorHtml(selected)}</div>`:''}<label class="pm-label">달력 일정 연결 (선택)</label><select class="pm-input" data-check-event ${selected.locked?'disabled':''}><option value="">연결하지 않음</option>${options}</select><div class="pm-row"><button data-check-action="edit-title" ${selected.locked?'disabled':''}>✏️ 목록 이름</button><button data-check-action="delete">🗑️ 목록 삭제</button></div>${checkEditingTitle?`<div class="pm-row"><input class="pm-input pm-check-new-input" data-check-title-value value="${pcEsc(selected.title)}"><button data-check-action="save-title">저장</button><button data-check-action="cancel-title">취소</button></div>`:''}`}`:''}
  ${!widget&&checkEditorTab==='style'?checkDecorHtml(selected):''}
  ${!widget&&checkEditorTab==='settings'?`<label class="pm-switch">🔒 목록 수정 잠금 <input type="checkbox" data-check-setting="locked" ${selected.locked?'checked':''}></label><label class="pm-switch">📌 목록 상단 고정 <input type="checkbox" data-check-setting="pinned" ${selected.pinned?'checked':''}></label><label class="pm-switch">🙈 위젯에서 이 목록 숨기기 <input type="checkbox" data-check-setting="widgetHidden" ${selected.widgetHidden?'checked':''}></label><hr class="pm-separator"><b>🎀 체크리스트 위젯 공통 설정</b><label class="pm-switch">☑️ 메모 위젯 안에 체크 탭 표시 <input type="checkbox" data-check-global="inMemo" ${checklist.settings?.inMemo!==false?'checked':''}></label><label class="pm-switch">📋 별도 체크리스트 위젯 표시 (선택) <input type="checkbox" data-check-global="separate" ${checklist.settings?.separate?'checked':''}></label><label class="pm-switch">🎀 별도 위젯을 접힌 상태로 시작 <input type="checkbox" data-check-global="folded" ${checklist.settings?.folded?'checked':''}></label><label class="pm-switch">🔑 별도 위젯 위치·크기 잠금 <input type="checkbox" data-check-global="positionLocked" ${checklist.settings?.positionLocked?'checked':''}></label><div class="pm-muted">체크리스트를 숨겨도 저장된 목록은 삭제되지 않아요.</div>`:''}</div>`:''}
  ${widget?'<button type="button" data-check-action="open">체크리스트 관리 열기</button>':''}`;
@@ -583,7 +583,8 @@ function pmBindChecklist(host,widget=false){
  host.querySelectorAll('[data-check-color]').forEach(e=>e.onclick=()=>{const l=chosen();if(!l||l.locked)return;l.formats=checkFormats(l);l.formats[e.dataset.checkColor].color=e.dataset.checkColorValue;checkSave();repaint()});
  host.querySelectorAll('[data-check-custom-color]').forEach(e=>e.oninput=()=>{const l=chosen();if(!l||l.locked)return;l.formats=checkFormats(l);l.formats[e.dataset.checkCustomColor].color=e.value;checkSave()});
  host.querySelectorAll('[data-check-action]').forEach(b=>b.onclick=()=>{const a=b.dataset.checkAction,l=chosen();
- if(a==='new'){checkCreating=true;repaint();host.querySelector('[data-check-new-title]')?.focus()}
+ if(a==='toggle-content-decor'){checkContentDecorOpen=!checkContentDecorOpen;repaint()}
+ else if(a==='new'){checkCreating=true;repaint();host.querySelector('[data-check-new-title]')?.focus()}
  else if(a==='cancel-new'){checkCreating=false;repaint()}
  else if(a==='save-new'){const v=host.querySelector('[data-check-new-title]')?.value.trim();if(!v)return;const x={id:uid(),title:v,emoji:'☑️',timeline:checklistTimeline,eventId:'',items:[],formats:checkFmtDefaults()};checklist.lists.push(x);checklistSelected=x.id;checkCreating=false;checkEditorTab='content';checkSave();repaint()}
  else if(a==='add-item'){const input=host.querySelector('[data-check-new-input]');const v=input?.value.trim();if(!l||l.locked||!v)return;l.items.push({id:uid(),text:v,done:false});checkSave();repaint()}
@@ -671,3 +672,4 @@ const pcCss=document.createElement('style');pcCss.textContent=`#pm-panel .pc-swi
 
 data=read(current);calLoad();checkLoad();render();pcRenderWidget();checkRenderSeparateWidget();setInterval(changeRoom,500);window.addEventListener('popstate',changeRoom);window.addEventListener('hashchange',changeRoom);
 })();
+
